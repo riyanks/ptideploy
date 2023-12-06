@@ -5,8 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently \"py SensorAcc.py\" \"py SensorInt.py\" \"py SismonWrs.py\""
+    "start": "concurrently \"python3 SensorAcc.py\" \"python3 SensorInt.py\" \"python3 SismonWrs.py\""
   },
+
+    
+
   "keywords": [],
   "author": "",
   "license": "ISC",
