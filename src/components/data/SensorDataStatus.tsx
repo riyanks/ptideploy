@@ -177,7 +177,7 @@ const SensorDataStatus: React.FC<SensorDataProps> = ({
 
   return (
     <>
-      <h1 className="text-7xl p-4 mb-6 font-bold text-center scroll-m-20 border-b tracking-tight first:mt-0">{`Sensor ${sensorType}`}</h1>
+      <h1 className="text-4xl p-4 mb-6 font-bold text-center scroll-m-20 border-b tracking-tight first:mt-0">{`Sensor ${sensorType}`}</h1>
       <div
         ref={componentRef}
         className="flex flex-col min-h-screen overflow-x-auto"

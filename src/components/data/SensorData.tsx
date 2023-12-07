@@ -1,9 +1,14 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react'
-import { FileIcon, TableIcon, ReaderIcon, UpdateIcon } from '@radix-ui/react-icons'
+import React, { useState, useEffect, useRef } from "react";
+import {
+  FileIcon,
+  TableIcon,
+  ReaderIcon,
+  UpdateIcon,
+} from "@radix-ui/react-icons";
 
-import ReactToPrint from 'react-to-print'
+import ReactToPrint from "react-to-print";
 import {
   Table,
   TableHeader,
@@ -11,70 +16,88 @@ import {
   TableRow,
   TableBody,
   TableCell,
-} from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import Loading from '@/components/ui/loading'
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Loading from "@/components/ui/loading";
 
-import { ExportToCsv } from '../exports/ExportToCsv'
-import { ExportToExcel } from '../exports/ExportToExcel'
-import { ExportToTxt } from '../exports/ExportToTxt'
-import { handleUpdateData } from './UpdateData'
-import { ExportAlertDialog } from '../exports/ExportAlertDialog'
+import { ExportToCsv } from "../exports/ExportToCsv";
+import { ExportToExcel } from "../exports/ExportToExcel";
+import { ExportToTxt } from "../exports/ExportToTxt";
+import { handleUpdateData } from "./UpdateData";
+import { ExportAlertDialog } from "../exports/ExportAlertDialog";
+import { toast } from "react-toastify";
 
 interface SensorDataProps {
-  sensorType: string
-  endpoint: string
+  sensorType: string;
+  endpoint: string;
 }
 
 const SensorData: React.FC<SensorDataProps> = ({ sensorType, endpoint }) => {
-  const [data, setData] = useState<any[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const componentRef = useRef<HTMLDivElement>(null)
-  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
-  const [selectedExportType, setSelectedExportType] = useState('')
+  const [data, setData] = useState<any[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const componentRef = useRef<HTMLDivElement>(null);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [selectedExportType, setSelectedExportType] = useState("");
 
-  const [searchTerm, setSearchTerm] = useState('');
-
-
+  const [searchTerm, setSearchTerm] = useState("");
 
   const buttonExport = [
-    { title: 'CSV', icon: <FileIcon />, export: () => ExportToCsv(data, 'sensor_data.csv'), style: 'gap-3 bg-green-400 hover:bg-green-600' },
-    { title: 'Excel', icon: <TableIcon />, export: () => ExportToExcel(data, 'sensor_data.xlsx'), style: 'gap-3 bg-green-700 hover:bg-green-900' },
-    { title: 'TXT', icon: <ReaderIcon />, export: () => ExportToTxt(data, 'sensor_data.txt'), style: 'gap-3 bg-stone-600 hover:bg-stone-800' }
-  ]
+    {
+      title: "CSV",
+      icon: <FileIcon />,
+      export: () => ExportToCsv(data, "sensor_data.csv"),
+      style: "gap-3 bg-green-400 hover:bg-green-600",
+    },
+    {
+      title: "Excel",
+      icon: <TableIcon />,
+      export: () => ExportToExcel(data, "sensor_data.xlsx"),
+      style: "gap-3 bg-green-700 hover:bg-green-900",
+    },
+    {
+      title: "TXT",
+      icon: <ReaderIcon />,
+      export: () => ExportToTxt(data, "sensor_data.txt"),
+      style: "gap-3 bg-stone-600 hover:bg-stone-800",
+    },
+  ];
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch(endpoint)
-        const result = await response.json()
+        const response = await fetch(endpoint);
+        const result = await response.json();
         if (response.ok) {
-          setData(result)
+          toast.success("Data berhasil diperbarui");
+          setData(result);
         } else {
-          setError(result.error)
+          toast.error(result.error);
+          setError(result.error);
         }
       } catch (error) {
-        setError('Error fetching data.')
+        toast.error("Data gagal diambil");
+        setError("Error fetching data.");
       }
     }
-    fetchData()
-  }, [endpoint])
+    fetchData();
+  }, [endpoint]);
 
   const filteredData = data
     ? data.filter((row) =>
-      Object.values(row).some(
-        (value) =>
+        Object.values(row).some((value) =>
           String(value).toLowerCase().includes(searchTerm.toLowerCase())
+        )
       )
-    )
     : [];
-
 
   return (
     <>
       <h1 className="text-4xl p-4 mb-6 font-bold text-center scroll-m-20 border-b tracking-tight first:mt-0">{`Sensor ${sensorType}`}</h1>
-      <div ref={componentRef} className="flex flex-col min-h-screen overflow-x-auto">
+      <div
+        ref={componentRef}
+        className="flex flex-col min-h-screen overflow-x-auto"
+      >
         <div className="flex-grow overflow-x-auto">
           {error ? (
             <p>{error}</p>
@@ -88,10 +111,7 @@ const SensorData: React.FC<SensorDataProps> = ({ sensorType, endpoint }) => {
                 <div className="flex flex-row gap-4 py-2">
                   <ReactToPrint
                     trigger={() => (
-                      <Button
-                        variant='outline'
-                        className="gap-3"
-                      >
+                      <Button variant="outline" className="gap-3">
                         <ReaderIcon />
                         Print
                       </Button>
@@ -115,14 +135,18 @@ const SensorData: React.FC<SensorDataProps> = ({ sensorType, endpoint }) => {
                   </div>
                 </div>
               </div>
-              <div className="rounded-md border my-3 bg-white" ref={componentRef}>
+              <div
+                className="rounded-md border my-3 bg-white"
+                ref={componentRef}
+              >
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>No.</TableHead>
-                      {data && Object.keys(data[0]).map((header, index) => (
-                        <TableHead key={index}>{header}</TableHead>
-                      ))}
+                      {data &&
+                        Object.keys(data[0]).map((header, index) => (
+                          <TableHead key={index}>{header}</TableHead>
+                        ))}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -143,15 +167,15 @@ const SensorData: React.FC<SensorDataProps> = ({ sensorType, endpoint }) => {
                     <Button
                       key={index}
                       onClick={() => {
-                        setIsExportDialogOpen(true)
-                        setSelectedExportType(item.title)
+                        setIsExportDialogOpen(true);
+                        setSelectedExportType(item.title);
                       }}
                       className={item.style}
                     >
                       {item.icon}
                       {item.title}
                     </Button>
-                  )
+                  );
                 })}
               </div>
 
@@ -160,19 +184,19 @@ const SensorData: React.FC<SensorDataProps> = ({ sensorType, endpoint }) => {
                 onCancel={() => setIsExportDialogOpen(false)}
                 onExport={() => {
                   switch (selectedExportType) {
-                    case 'CSV':
-                      ExportToCsv(data, 'sensor_data.csv')
-                      break
-                    case 'Excel':
-                      ExportToExcel(data, 'sensor_data.xlsx')
-                      break
-                    case 'TXT':
-                      ExportToTxt(data, 'sensor_data.txt')
-                      break
+                    case "CSV":
+                      ExportToCsv(data, "sensor_data.csv");
+                      break;
+                    case "Excel":
+                      ExportToExcel(data, "sensor_data.xlsx");
+                      break;
+                    case "TXT":
+                      ExportToTxt(data, "sensor_data.txt");
+                      break;
                     default:
-                      break
+                      break;
                   }
-                  setIsExportDialogOpen(false)
+                  setIsExportDialogOpen(false);
                 }}
               />
             </>
@@ -180,7 +204,7 @@ const SensorData: React.FC<SensorDataProps> = ({ sensorType, endpoint }) => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default SensorData
+export default SensorData;
