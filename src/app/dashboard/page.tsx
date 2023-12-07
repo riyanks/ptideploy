@@ -15,7 +15,7 @@ import dynamic from "next/dynamic";
 const Dashboard = async () => {
   const session = await getServerSession();
   if (!session) {
-    redirect("/");
+    redirect("http://103.82.93.77:3000");
   }
  
   return (
