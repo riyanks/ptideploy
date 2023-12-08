@@ -20,6 +20,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Loading from "@/components/ui/loading";
+import { useSession } from 'next-auth/react';
+import { redirect } from "next/navigation";
+
 
 import { ExportToCsv } from "../exports/ExportToCsv";
 import { ExportToExcel } from "../exports/ExportToExcel";
@@ -39,6 +42,7 @@ const SensorData: React.FC<SensorDataProps> = ({ sensorType, endpoint }) => {
   const componentRef = useRef<HTMLDivElement>(null);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [selectedExportType, setSelectedExportType] = useState("");
+  const { data: session } = useSession();
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -64,6 +68,10 @@ const SensorData: React.FC<SensorDataProps> = ({ sensorType, endpoint }) => {
   ];
 
   useEffect(() => {
+    if (!session) {
+      redirect("http://103.82.93.77:3000");
+      return;
+    }
     async function fetchData() {
       try {
         const response = await fetch(endpoint);
@@ -81,7 +89,7 @@ const SensorData: React.FC<SensorDataProps> = ({ sensorType, endpoint }) => {
       }
     }
     fetchData();
-  }, [endpoint]);
+  }, [endpoint, session]);
 
   const filteredData = data
     ? data.filter((row) =>

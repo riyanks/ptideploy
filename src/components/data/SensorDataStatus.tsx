@@ -33,6 +33,8 @@ import {
   Switch,
 } from "@tremor/react";
 import dataBarbie from "../../movie-barbie.json";
+import { useSession } from 'next-auth/react';
+import { redirect } from "next/navigation";
 
 import { ExportToCsv } from "../exports/ExportToCsv";
 import { ExportToExcel } from "../exports/ExportToExcel";
@@ -76,6 +78,8 @@ const SensorDataStatus: React.FC<SensorDataProps> = ({
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10; // Jumlah item per halaman
+  const { data: session, status } = useSession();
+
 
   const countOn = data ? data.filter((item) => item.Status === "ON").length : 0;
   const countOff = data
@@ -159,6 +163,10 @@ const SensorDataStatus: React.FC<SensorDataProps> = ({
   ];
 
   useEffect(() => {
+    if (!session) {
+      redirect("http://103.82.93.77:3000");
+      return;
+    }
     async function fetchData() {
       try {
         const response = await fetch(endpoint);
@@ -173,7 +181,7 @@ const SensorDataStatus: React.FC<SensorDataProps> = ({
       }
     }
     fetchData();
-  }, [endpoint]);
+  }, [endpoint, session]);
 
   return (
     <>
